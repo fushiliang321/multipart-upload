@@ -2,9 +2,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
-    outDir: 'worker/dist', 
+    outDir: 'worker/dispatch', 
     lib: {
-      entry: './worker/workerDispatch.ts', 
+      entry: './worker/dispatch.ts', 
       name: 'multipart-upload-zct', 
       formats: ['es'],
     },

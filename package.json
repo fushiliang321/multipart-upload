@@ -1,14 +1,11 @@
 {
   "name": "multipart-upload-zct",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "分片上传",
   "author": "",
   "license": "ISC",
   "type": "module",
   "main": "index.ts",
-  "scripts": {
-    "prepublishOnly": "npx vite build --config multipart-upload-zct-vite.config.js"
-  },
   "dependencies": {
     "axios": "^1.7.2",
     "js-md5": "^0.8.3"
