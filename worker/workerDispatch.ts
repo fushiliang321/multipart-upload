@@ -9,7 +9,7 @@ export default class worker {
 
     constructor(num?: number) {
         if (!num || num < 1) {
-            num = navigator.hardwareConcurrency
+            num = navigator?.hardwareConcurrency
             if (num < 1) {
                 num = 1
             }
