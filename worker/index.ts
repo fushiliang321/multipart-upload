@@ -1,5 +1,5 @@
 import { Message } from './index.d';
-import webworker from './dist/dispatch/dispatch.es';
+import webworker from './dispatch/dispatch.es';
  
 const tasks: Map<string, any> = new Map<string, any>()
 

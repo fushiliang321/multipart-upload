@@ -2,8 +2,8 @@ import { config, configType } from './config'
 import CurrentLimiter from './CurrentLimiter'
 import { requestAdapterInterface } from './requestAdapters/interface'
 import CacheInterface  from './cache/interface'
-import { fileMD5 } from './worker/index'
 import FileStream from './fileStream/index'
+import { FileStreamInterface } from './fileStream/index.d'
 
 function newMultipartUploadTask(fun: Function): Promise<any> {
     const task = new Promise(async (resolve, reject) => {
@@ -70,7 +70,7 @@ const cacheFileWriteCurrentLimiter = new CurrentLimiter(1) //缓存文件写入�
 export default class MultipartUpload {
     size: number = 0 //文件大小
     md5: string = '' //文件md5
-    fileStream?: FileStream //文件流
+    fileStream?: FileStreamInterface //文件流
     
     name: string = '' //文件名
     contentType: string = '' //文件类型
@@ -105,7 +105,7 @@ export default class MultipartUpload {
 
     currentLimiter: CurrentLimiter = new CurrentLimiter(1) //并发限流器
 
-    cache?: CacheInterface;
+    cache?: CacheInterface
     cacheId?: IDBValidKey
 
     constructor(requestAdapter: requestAdapterInterface, cache?: CacheInterface) {
@@ -396,7 +396,7 @@ export default class MultipartUpload {
         return await this.complete(retryNum)
     }
 
-    async setFile(file: File): Promise<boolean> {
+    async setFileStream(fileStream: FileStreamInterface): Promise<boolean> {
         if (this.status != statusTags.uninitialized) {
             return false
         }
@@ -407,25 +407,25 @@ export default class MultipartUpload {
         }
 
         try {
-            if (!this.md5) {
-                this.md5 = await fileMD5(file)
+            if (this.config.isCheckoutFileMD5 && !this.md5) {
+                this.md5 = await fileStream.md5()
             }
             if (this.status != statusTags.uninitialized) {
                 return false
             }
-            this.name = file.name
-            this.contentType = file.type
-            this.size = file.size
-            this.fileStream = new FileStream(file)
+            this.name = fileStream.name
+            this.contentType = fileStream.type
+            this.size = fileStream.size
+            this.fileStream = fileStream
             if(this.cache) {
                 if (currentLimiterAwait) {
                     await currentLimiterAwait
                 }
-                const cacheKey = await this.cache.add(this.fileUniqueKey(), file, {
-                    name: file.name,
-                    size: file.size,
+                const cacheKey = await this.cache.add(this.fileUniqueKey(), fileStream.getFile(), {
+                    name: fileStream.name,
+                    size: fileStream.size,
                     md5: this.md5,
-                    type: file.type,
+                    type: fileStream.type,
                 }, this.getUploadInfo())
                 if (cacheKey) {
                     this.cacheId = cacheKey
@@ -464,18 +464,25 @@ export default class MultipartUpload {
         return task
     }
 
-    upload(file: File, requestParams: object = {}): Promise<boolean|any>  {
+    upload(fileStream: File|Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
         return this.newMultipartUploadTask(async () => {
             if (this.status == statusTags.initializing || 
                 this.status == statusTags.uploading || 
                 this.status == statusTags.merging) {
                     //进行中的不能上传
-                    console.log('进行中的不能上传')
                 return false
             }
             this.reset()
             this.requestParams = requestParams
-            await this.setFile(file)
+            switch (true) {
+                case fileStream instanceof Blob:
+                    fileStream = new FileStream(new File([fileStream],'blob'))
+                    break;
+                case fileStream instanceof File:
+                    fileStream = new FileStream(fileStream)
+                    break;
+            }
+            await this.setFileStream(fileStream)
             return await this._handle()
         })
     }

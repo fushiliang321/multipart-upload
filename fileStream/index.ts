@@ -1,15 +1,22 @@
+import { fileMD5 } from '../worker/index'
+import { FileStreamInterface, readCallBackFunction } from './index.d'
 
-type readCallBackFunction = (data: Uint8Array, done: boolean) => Promise<any> | any
-
-export default class FileStream {
-    file: File
+export default class FileStream implements FileStreamInterface{
+    private _file: File
+    private _md5?: string
+    name: string
+    type: string
+    size: number
 
     constructor(file: File) {
-        this.file = file
+        this._file = file
+        this.name = file.name
+        this.type = file.type
+        this.size = file.size
     }
 
     private async getReader(options?: ReadableStreamGetReaderOptions, start?: number, end?: number): Promise<ReadableStreamReader<Uint8Array>> {
-        return this.file.slice(start, end).stream().getReader(options)
+        return this._file.slice(start, end).stream().getReader(options)
     }
 
     async read(callBack: readCallBackFunction, bufferLength?: number, start?: number, end?: number) {
@@ -50,4 +57,14 @@ export default class FileStream {
         }
     }
 
+    getFile(): File {
+        return this._file
+    }
+
+    async md5(): Promise<string> {
+        if (!this._md5) {
+            this._md5 = await fileMD5(this._file)
+        }
+        return this._md5 as string
+    }
 }

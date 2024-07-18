@@ -11,6 +11,7 @@ export type configType = {
     retryNum: number,
     retryInterval: number,
     concurrency: number,
+    isCheckoutFileMD5: boolean,
     assureCacheFileWriteSequence: boolean,
 }
 
@@ -25,6 +26,7 @@ const defaultConfig: configType = {
     retryNum: 5, //失败重试次数
     retryInterval: 1000, //失败重试间隔（毫秒）
     concurrency: 1, //并发上传分片数量
+    isCheckoutFileMD5: true, //是否校验文件md5
     assureCacheFileWriteSequence: true, //是否需要保证缓存文件写入顺序
 }
 
