@@ -396,6 +396,21 @@ export default class MultipartUpload {
         return await this.complete(retryNum)
     }
 
+    async setFile(file: File|Blob): Promise<boolean> {
+        let fileStream: FileStream
+        switch (true) {
+            case file instanceof Blob:
+                fileStream = new FileStream(new File([file],'blob'))
+                break;
+            case file instanceof File:
+                fileStream = new FileStream(file)
+                break;
+            default:
+                return false
+        }
+        return await this.setFileStream(fileStream)
+    }
+
     async setFileStream(fileStream: FileStreamInterface): Promise<boolean> {
         if (this.status != statusTags.uninitialized) {
             return false
@@ -464,7 +479,7 @@ export default class MultipartUpload {
         return task
     }
 
-    upload(fileStream: File|Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
+    upload(file: File|Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
         return this.newMultipartUploadTask(async () => {
             if (this.status == statusTags.initializing || 
                 this.status == statusTags.uploading || 
@@ -474,15 +489,15 @@ export default class MultipartUpload {
             }
             this.reset()
             this.requestParams = requestParams
-            switch (true) {
-                case fileStream instanceof Blob:
-                    fileStream = new FileStream(new File([fileStream],'blob'))
-                    break;
-                case fileStream instanceof File:
-                    fileStream = new FileStream(fileStream)
-                    break;
+            if (file instanceof Blob || file instanceof File) {
+                if (!await this.setFile(file)) {
+                    return false
+                }
+            }else{
+                if (!await this.setFileStream(file)) {
+                    return false
+                }
             }
-            await this.setFileStream(fileStream)
             return await this._handle()
         })
     }
