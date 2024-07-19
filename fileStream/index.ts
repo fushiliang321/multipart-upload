@@ -31,14 +31,16 @@ export default class FileStream implements FileStreamInterface{
                 while(true) {
                     const { done, value } = await reader.read(new Uint8Array(bufferLength - offset))
                     if (done) {
-                        await callBack(new Uint8Array(buffer.buffer, 0, offset), true)
+                        await callBack(buffer.buffer.slice(0, offset), true)
                         break
                     }
                     buffer.set(value, offset)
                     offset += value.byteLength
                     if (offset >= buffer.byteLength) {
+                        if (!await callBack(buffer.buffer.slice(0), false)) {
+                            return
+                        }
                         offset = 0
-                        await callBack(new Uint8Array(buffer.buffer), false)
                     }
                 }
             }else if (reader instanceof ReadableStreamDefaultReader) {
@@ -46,10 +48,12 @@ export default class FileStream implements FileStreamInterface{
                     //没有指定缓冲区长度，就直接返回每次读取到的数据
                     const { done, value } = await reader.read()
                     if (done) {
-                        await callBack(new Uint8Array(), true)
+                        await callBack(new ArrayBuffer(0), true)
                         break
                     }
-                    await callBack(value, false)
+                    if (!await callBack(value.buffer.slice(0), false)) {
+                        return
+                    }
                 }
             }
         } catch (error) {

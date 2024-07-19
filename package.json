@@ -1,6 +1,6 @@
 {
   "name": "multipart-upload-zct",
-  "version": "2.1.9",
+  "version": "2.2.0",
   "description": "分片上传",
   "author": "",
   "license": "ISC",
@@ -14,10 +14,10 @@
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.9.1"
   },
-	"keywords": [
-		"multipart-upload",
-		"upload"
-	],
+  "keywords": [
+    "multipart-upload",
+    "upload"
+  ],
   "homepage": "https://github.com/fushiliang321/multipart-upload",
   "bugs": {
     "url": "https://github.com/fushiliang321/multipart-upload/issues"

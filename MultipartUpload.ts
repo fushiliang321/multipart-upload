@@ -3,6 +3,7 @@ import CurrentLimiter from './CurrentLimiter'
 import { requestAdapterInterface } from './requestAdapters/interface'
 import CacheInterface  from './cache/interface'
 import FileStream from './fileStream/index'
+import WMPFileStream from './fileStream/WeChatMiniProgram'
 import { FileStreamInterface } from './fileStream/index.d'
 
 function newMultipartUploadTask(fun: Function): Promise<any> {
@@ -192,14 +193,14 @@ export default class MultipartUpload {
         return await this.init(retryNum)
     }
 
-    async partUpload(file: Blob, number: number, retryNum?: number): Promise<PartETag|false> {
+    async partUpload(file: ArrayBuffer|Uint8Array, number: number, retryNum?: number): Promise<PartETag|false> {
         if (this.status != statusTags.uploading) {
             return false
         }
         let presentBytesSent = 0 //当前已发送的字节数
         try {
             let reqEndFlag = false //请求结束标记
-            const size = file.size
+            const size = file.byteLength
             const request = this.requestAdapter.part(this.config.api.part, file, {
                 uploadId: this.uploadId,
                 number: number,
@@ -297,12 +298,14 @@ export default class MultipartUpload {
 
         await this.fileStream.read(async (data, done) => {
             const number = i++
-            if (over || 
-                this.uploadFinishPartNumberMap.has(number) ||
-                !data.byteLength) {
-                return
+            if (over) {
+                return false
             }
             
+            if (this.uploadFinishPartNumberMap.has(number) || !data.byteLength) {
+                return true
+            }
+
             await this.currentLimiter.pop()
             if (over) {
                 this.currentLimiter.push()
@@ -310,9 +313,11 @@ export default class MultipartUpload {
             }
             
             taskList.push(new Promise(async (resolve, reject) => {
+                let notPush = true
                 try {
-                    const response = await this.partUpload(new Blob([data]), number)
+                    const response = await this.partUpload(data, number)
                     this.currentLimiter.push()
+                    notPush = false
                     if(response) {
                         this.uploadProgressInc(data.byteLength)
                         this.parts.push(response)
@@ -329,12 +334,12 @@ export default class MultipartUpload {
                     }
                     resolve(response)
                 } catch (error) {
-                    this.currentLimiter.push()
+                    notPush && this.currentLimiter.push()
                     abort()
                     reject(error)
                 }
             }))
-            
+            return true
         }, this.maxPartSize, start)
         
         await Promise.all(taskList)
@@ -399,11 +404,11 @@ export default class MultipartUpload {
     async setFile(file: File|Blob): Promise<boolean> {
         let fileStream: FileStream
         switch (true) {
-            case file instanceof Blob:
-                fileStream = new FileStream(new File([file],'blob'))
-                break;
             case file instanceof File:
                 fileStream = new FileStream(file)
+                break;
+            case file instanceof Blob:
+                fileStream = new FileStream(new File([file],'blob'))
                 break;
             default:
                 return false
@@ -479,7 +484,7 @@ export default class MultipartUpload {
         return task
     }
 
-    upload(file: File|Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
+    upload(file: Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
         return this.newMultipartUploadTask(async () => {
             if (this.status == statusTags.initializing || 
                 this.status == statusTags.uploading || 
@@ -489,14 +494,21 @@ export default class MultipartUpload {
             }
             this.reset()
             this.requestParams = requestParams
-            if (file instanceof Blob || file instanceof File) {
-                if (!await this.setFile(file)) {
+
+            switch (true) {
+                case file instanceof FileStream:
+                case file instanceof WMPFileStream:
+                    if (!await this.setFileStream(file as WMPFileStream)) {
+                        return false
+                    }
+                    break;
+                case file instanceof Blob:
+                    if (!await this.setFile(file)) {
+                        return false
+                    }
+                    break;
+                default:
                     return false
-                }
-            }else{
-                if (!await this.setFileStream(file)) {
-                    return false
-                }
             }
             return await this._handle()
         })

@@ -1,4 +1,4 @@
-export type readCallBackFunction = (data: Uint8Array, done: boolean) => Promise<any> | any
+export type readCallBackFunction = (data: ArrayBuffer, done: boolean) => Promise<any> | any
 
 export interface FileStreamInterface {
     name: string
