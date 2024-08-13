@@ -2,6 +2,7 @@ import axios from "axios"
 import { abortPromiseInterface, requestAdapterInterface } from './interface'
 import CacheInterface from "../cache/interface"
 import MultipartUpload from "../MultipartUpload"
+import { AxiosInstance, AxiosRequestConfig } from "./index"
 
 export function New(adapterConfig: object = {}, cache?: CacheInterface): MultipartUpload {
     return new MultipartUpload(new requestAdapter(adapterConfig), cache)
@@ -9,18 +10,25 @@ export function New(adapterConfig: object = {}, cache?: CacheInterface): Multipa
 
 //请求处理方法
 export default class requestAdapter implements requestAdapterInterface{
-    requestInstance
+    requestInstance: AxiosInstance
     
     constructor(config: object = {}) {
-        this.requestInstance = axios.create(config)
+        this.requestInstance = axios.create(config) as AxiosInstance
+    }
+
+    private post(url: string, data?: any, config?: AxiosRequestConfig<any>): abortPromiseInterface {
+        const controller = new AbortController()
+        if (!config) {
+            config = {}
+        }
+        config.signal = controller.signal
+        const req = this.requestInstance.post(url, data, config) as unknown as abortPromiseInterface
+        req.abort = (reason: any) => controller.abort(reason)
+        return req
     }
 
     init(url: string, params: object): abortPromiseInterface {
-        const controller = new AbortController()
-        const signal = controller.signal
-        const req = this.requestInstance.post(url, params, {signal})
-        req.abort = (reason: any) => controller.abort(reason)
-        return req
+        return this.post(url, params)
     }
     
     part(url: string, file: Blob|ArrayBuffer|Uint8Array, params: object, onUploadProgress: (e: any) => void): abortPromiseInterface {
@@ -32,10 +40,7 @@ export default class requestAdapter implements requestAdapterInterface{
         }else {
             throw new Error('file must be Blob or ArrayBuffer')
         }
-        const controller = new AbortController()
-        const signal = controller.signal
-        const req = this.requestInstance.post(url, formData, {
-            signal,
+        return this.post(url, formData, {
             params,
             onUploadProgress: (e: any) => {
                 onUploadProgress({
@@ -45,15 +50,9 @@ export default class requestAdapter implements requestAdapterInterface{
                 })
             }
         })
-        req.abort = (reason: any) => controller.abort(reason)
-        return req
     }
 
     complete(url: string, params: object): abortPromiseInterface  {
-        const controller = new AbortController()
-        const signal = controller.signal
-        const req = this.requestInstance.post(url, params, {signal})
-        req.abort = (reason: any) => controller.abort(reason)
-        return req
+        return this.post(url, params)
     }
 }
