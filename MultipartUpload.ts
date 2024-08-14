@@ -6,14 +6,22 @@ import FileStream from './fileStream/index'
 import WMPFileStream from './fileStream/WeChatMiniProgram'
 import { FileStreamInterface } from './fileStream/index.d'
 
-function newMultipartUploadTask(fun: Function): Promise<any> {
+interface Task<T> extends Promise<T>{
+    onUploadProgress: (listener: (progress: UploadProgress) => void) => void,
+    abort: (reason: any) => void,
+    resume: () => Promise<any> | undefined,
+    clearCache: () => Promise<any> | undefined,
+    multipartUpload?: MultipartUpload
+}
+
+function newMultipartUploadTask(fun: Function): Task<any> {
     const task = new Promise(async (resolve, reject) => {
         try {
             resolve(await fun())
         } catch (error) {
             reject(error)
         }
-    })
+    }) as unknown as Task<any>
 
     task.onUploadProgress = (listener: (progress: UploadProgress) => void): void => {
         return task.multipartUpload?.onUploadProgress(listener)
@@ -90,7 +98,7 @@ export default class MultipartUpload {
     requestAdapter: requestAdapterInterface //请求适配器
     requestAbortFuns: Function[] = [] //请求中断方法
 
-    lastResponse: any = null //最后响应数据
+    lastResponse?: any //最后响应数据
 
     progressListeners:((progress: UploadProgress) => void)[] = [] //进度监听列表
     progress: number = 0 //上传进度百分比
@@ -100,7 +108,7 @@ export default class MultipartUpload {
 
     parts: PartETag[] = [] //分片上传响应数据
 
-    error: unknown //错误信息
+    error?: any //错误信息
 
     resumeStatusTag: statusTags = statusTags.uninitialized //标记可以恢复的状态
 
@@ -464,27 +472,26 @@ export default class MultipartUpload {
         this.setStatus(statusTags.uninitialized)
         this.resumeStatusTag = statusTags.uninitialized
         this.requestAbortFuns = []
-        this.lastResponse = null
+        this.lastResponse = undefined
         this.parts = []
         this.progress = 0
         this.totalBytesSent = 0
         this.uploadFinishPartSize = 0
-        this.error = null
+        this.error = undefined
         this.uploadFinishPartNumberMap = new Map<number, boolean>()
         this.fileStream = undefined
         this.md5 = ""
     }
 
-    newMultipartUploadTask(fun: Function): Promise<any>  {
+    newMultipartUploadTask(fun: Function): Task<any> {
         const task = newMultipartUploadTask(async () => {
             return await fun()
         })
-
         task.multipartUpload = this
         return task
     }
 
-    upload(file: Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
+    upload(file: Blob|FileStreamInterface, requestParams: object = {}): Task<any>  {
         return this.newMultipartUploadTask(async () => {
             if (this.status == statusTags.initializing ||
                 this.status == statusTags.uploading ||
@@ -514,7 +521,7 @@ export default class MultipartUpload {
         })
     }
 
-    resume(): Promise<any>{
+    resume(): Task<any>{
         return this.newMultipartUploadTask(async () => {
             switch (this.status) {
                 case statusTags.completed:
@@ -530,13 +537,13 @@ export default class MultipartUpload {
         })
     }
 
-    handle(): Promise<boolean|any> {
+    handle(): Task<any> {
         return this.newMultipartUploadTask(async () => {
             return await this._handle()
         })
     }
 
-    async _handle(): Promise<boolean|any>  {
+    async _handle(): Promise<any>  {
         let res = false
         let isTrue = this.resumeStatusTag == statusTags.uninitialized
         if (isTrue &&
