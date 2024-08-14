@@ -8,7 +8,7 @@ addEventListener('message',async (e: MessageEvent) => {
     case 'fileMD5':
       res = await fileMD5(data.data.file)
       break;
-  
+
     default:
       break;
   }

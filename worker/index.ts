@@ -1,6 +1,6 @@
 import { Message } from './index.d';
 import webworker from './dispatch/dispatch.es';
- 
+
 const tasks: Map<string, any> = new Map<string, any>()
 
 let _worker: webworker

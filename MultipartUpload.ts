@@ -72,7 +72,7 @@ export default class MultipartUpload {
     size: number = 0 //文件大小
     md5: string = '' //文件md5
     fileStream?: FileStreamInterface //文件流
-    
+
     name: string = '' //文件名
     contentType: string = '' //文件类型
 
@@ -89,7 +89,7 @@ export default class MultipartUpload {
 
     requestAdapter: requestAdapterInterface //请求适配器
     requestAbortFuns: Function[] = [] //请求中断方法
-    
+
     lastResponse: any = null //最后响应数据
 
     progressListeners:((progress: UploadProgress) => void)[] = [] //进度监听列表
@@ -99,7 +99,7 @@ export default class MultipartUpload {
     uploadFinishPartNumberMap: Map<number, boolean> = new Map<number, boolean>() //上传完成的分片编号
 
     parts: PartETag[] = [] //分片上传响应数据
-    
+
     error: unknown //错误信息
 
     resumeStatusTag: statusTags = statusTags.uninitialized //标记可以恢复的状态
@@ -181,7 +181,7 @@ export default class MultipartUpload {
             console.warn(error)
             this.error = error
         }
-        
+
         if (retryNum == undefined) {
             retryNum = this.config.retryNum
         }
@@ -246,7 +246,7 @@ export default class MultipartUpload {
             console.warn(response)
         } catch (error) {
             console.warn(error)
-            
+
             this.addTotalBytesSent(-presentBytesSent)
             this.error = error
         }
@@ -279,7 +279,7 @@ export default class MultipartUpload {
             this.uploadFinishPartNumberMap = new Map<number, boolean>()
         }
 
-        let over = false 
+        let over = false
         const abort = (reason?: any) => {
             if(over) {
                 return
@@ -301,7 +301,7 @@ export default class MultipartUpload {
             if (over) {
                 return false
             }
-            
+
             if (this.uploadFinishPartNumberMap.has(number) || !data.byteLength) {
                 return true
             }
@@ -311,7 +311,7 @@ export default class MultipartUpload {
                 this.currentLimiter.push()
                 return false
             }
-            
+
             taskList.push(new Promise(async (resolve, reject) => {
                 let notPush = true
                 try {
@@ -341,13 +341,13 @@ export default class MultipartUpload {
             }))
             return true
         }, this.maxPartSize, start)
-        
+
         await Promise.all(taskList)
 
         if (over || this.status != statusTags.uploading) {
             return false
         }
-        
+
         return true
     }
 
@@ -364,7 +364,7 @@ export default class MultipartUpload {
                 parts: this.parts,
                 ...this.requestParams,
             })
-            
+
             const requestAbortFun = (reason: any) => {
                 request.abort && request.abort(reason)
             }
@@ -376,7 +376,7 @@ export default class MultipartUpload {
                 return false
             }
             this.lastResponse = response
-            
+
             if (response.status == 200) {
                 const data = response.data
                 if (data && data.code) {
@@ -420,7 +420,7 @@ export default class MultipartUpload {
         if (this.status != statusTags.uninitialized) {
             return false
         }
-        
+
         let currentLimiterAwait
         if (this.cache && this.config.assureCacheFileWriteSequence) {
             currentLimiterAwait = cacheFileWriteCurrentLimiter.pop()
@@ -470,7 +470,7 @@ export default class MultipartUpload {
         this.totalBytesSent = 0
         this.uploadFinishPartSize = 0
         this.error = null
-        this.uploadFinishPartNumberMap = new Map<number, boolean>() 
+        this.uploadFinishPartNumberMap = new Map<number, boolean>()
         this.fileStream = undefined
         this.md5 = ""
     }
@@ -486,8 +486,8 @@ export default class MultipartUpload {
 
     upload(file: Blob|FileStreamInterface, requestParams: object = {}): Promise<boolean|any>  {
         return this.newMultipartUploadTask(async () => {
-            if (this.status == statusTags.initializing || 
-                this.status == statusTags.uploading || 
+            if (this.status == statusTags.initializing ||
+                this.status == statusTags.uploading ||
                 this.status == statusTags.merging) {
                     //进行中的不能上传
                 return false
@@ -514,7 +514,7 @@ export default class MultipartUpload {
         })
     }
 
-    resume(): Promise<any>{  
+    resume(): Promise<any>{
         return this.newMultipartUploadTask(async () => {
             switch (this.status) {
                 case statusTags.completed:
@@ -539,19 +539,19 @@ export default class MultipartUpload {
     async _handle(): Promise<boolean|any>  {
         let res = false
         let isTrue = this.resumeStatusTag == statusTags.uninitialized
-        if (isTrue && 
+        if (isTrue &&
             this.status !== statusTags.uninitialized) {
             console.warn('当前状态无法上传')
             return res
         }
-        
+
         isTrue = isTrue || this.resumeStatusTag == statusTags.initializing
 
         if (isTrue) {
             this.setStatus(statusTags.initializing)
             if (this.cache && this.cacheId) {
                 await this.cache.update(this.cacheId, {
-                    status: this.status, 
+                    status: this.status,
                 })
             }
             this.requestAbortFuns = []
@@ -563,13 +563,13 @@ export default class MultipartUpload {
                 return res
             }
         }
-    
+
         isTrue = isTrue || this.resumeStatusTag == statusTags.uploading
         if (isTrue) {
             this.setStatus(statusTags.uploading)
             if (this.cache && this.cacheId) {
                 await this.cache.update(this.cacheId, {
-                    status: this.status, 
+                    status: this.status,
                     uploadInfo: this.getUploadInfo()
                 })
             }
@@ -582,13 +582,13 @@ export default class MultipartUpload {
                 return res
             }
         }
-        
+
         isTrue = isTrue || this.resumeStatusTag == statusTags.merging
         if (isTrue) {
             this.setStatus(statusTags.merging)
             if (this.cache && this.cacheId) {
                 await this.cache.update(this.cacheId, {
-                    status: this.status, 
+                    status: this.status,
                 })
             }
             this.requestAbortFuns = []
@@ -629,7 +629,7 @@ export default class MultipartUpload {
             this.status != statusTags.merging &&
             this.status != statusTags.initializing) {
                 this.setStatus(statusTags.abort)
-                return 
+                return
         }
         this.setStatus(statusTags.abort)
         for (const fun of this.requestAbortFuns) {
@@ -667,7 +667,7 @@ export default class MultipartUpload {
         }
         for (const listener of this.progressListeners) {
             listener(info)
-        }   
+        }
     }
 
     onUploadProgress(listener: (progress: UploadProgress) => void): void {

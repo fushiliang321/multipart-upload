@@ -8,10 +8,10 @@ export function New(adapterConfig: object = {}, cache?: CacheInterface): Multipa
 
 function appendUrlParamsToObject(url: string, paramsObj: { [key: string]: any }) {
 	let urlParams = [];
-  
+
 	for (let key in paramsObj) {
 	  let value = paramsObj[key];
-	  
+
 	  if (Array.isArray(value)) {
 		for (let item of value) {
 		  urlParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(item)}`);
@@ -20,16 +20,16 @@ function appendUrlParamsToObject(url: string, paramsObj: { [key: string]: any })
 		urlParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
 	  }
 	}
-  
+
 	let paramStr = urlParams.join('&');
-  
+
 	let separator = /\?/.test(url) ? '&' : '?';
 	return url + separator + paramStr;
   }
 
 export default class requestAdapter implements requestAdapterInterface{
 	config: object
-    
+
     constructor(config: object = {}) {
         this.config = config
     }
@@ -37,7 +37,7 @@ export default class requestAdapter implements requestAdapterInterface{
 
     init(url: string, params: object): abortPromiseInterface {
 		let abort: ((reason: any) => void ) | undefined
-		
+
 		const request = new Promise(async (resolve,reject)=>{
 			try{
 				const task = uni.request({
@@ -59,7 +59,7 @@ export default class requestAdapter implements requestAdapterInterface{
 		request.abort = abort
         return request
     }
-	
+
     part(url: string, file: Blob|ArrayBuffer|Uint8Array|string, params: object, onUploadProgress: (e: any) => void): abortPromiseInterface {
 		let abort: ((reason: any) => void ) | undefined
 
@@ -111,7 +111,7 @@ export default class requestAdapter implements requestAdapterInterface{
 						formData: params,
 					})
 				}
-				
+
 				abort = reason => {
 					uploadTask.abort(reason)
 				}
@@ -131,7 +131,7 @@ export default class requestAdapter implements requestAdapterInterface{
     }
 
     complete(url: string, params: object): abortPromiseInterface {
-		
+
 		let abort: ((reason: any) => void ) | undefined
 		const request = new Promise(async (resolve,reject)=>{
 			try{

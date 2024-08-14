@@ -22,7 +22,7 @@ export type progress = {
 
 export default class Group implements CacheInterface {
     groupName: string = 'default'
-    
+
     constructor(groupName: string = 'default'){
         this.groupName = String(groupName)
     }
@@ -90,7 +90,7 @@ export default class Group implements CacheInterface {
 
         //没有其他数据存在该key，则删除该key对应的文件
         cache.file.delete(key)
-        
+
         return true
     }
 }

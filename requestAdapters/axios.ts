@@ -11,7 +11,7 @@ export function New(adapterConfig: object = {}, cache?: CacheInterface): Multipa
 //请求处理方法
 export default class requestAdapter implements requestAdapterInterface{
     requestInstance: AxiosInstance
-    
+
     constructor(config: object = {}) {
         this.requestInstance = axios.create(config) as AxiosInstance
     }
@@ -30,7 +30,7 @@ export default class requestAdapter implements requestAdapterInterface{
     init(url: string, params: object): abortPromiseInterface {
         return this.post(url, params)
     }
-    
+
     part(url: string, file: Blob|ArrayBuffer|Uint8Array, params: object, onUploadProgress: (e: any) => void): abortPromiseInterface {
         const formData = new FormData()
         if (file instanceof ArrayBuffer || file instanceof Uint8Array) {

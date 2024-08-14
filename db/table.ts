@@ -22,9 +22,9 @@ export default class Table{
 
     /**
      * 添加数据
-     * @param value 
-     * @param key 
-     * @returns 
+     * @param value
+     * @param key
+     * @returns
      */
     async add(value: any, key?: IDBValidKey): Promise<IDBValidKey|false> {
         const store = await this.store('readwrite')
@@ -36,9 +36,9 @@ export default class Table{
 
     /**
      * 更新数据
-     * @param value 
-     * @param key 
-     * @returns 
+     * @param value
+     * @param key
+     * @returns
      */
     async put(value: any, key?: IDBValidKey, replace?: boolean): Promise<IDBValidKey|false> {
         const store = await this.store('readwrite')
@@ -66,11 +66,11 @@ export default class Table{
 
     /**
      * 通过索引更新数据
-     * @param indexKey 
-     * @param indexValue 
-     * @param data 
-     * @param replace 
-     * @returns 
+     * @param indexKey
+     * @param indexValue
+     * @param data
+     * @param replace
+     * @returns
      */
     async putByIndex(indexKey: string, indexValue: IDBValidKey | IDBKeyRange, data: object, replace?: boolean): Promise<IDBValidKey|false>{
         const store = await this.store('readwrite')
@@ -112,12 +112,12 @@ export default class Table{
     async getByIndex(key: string, query: IDBValidKey | IDBKeyRange): Promise<any>{
         return (await (await this.store())?.index(key).get(query))
     }
-    
+
     // 读取索引全部数据
     async getAllByIndex(key: string, query?: IDBValidKey | IDBKeyRange | null, count?: number): Promise<any[]> {
         return (await (await this.store())?.index(key).getAll(query, count)) ?? []
     }
-    
+
     // 统计指定索引的数据行数
     async countByIndex(key: string, query?: IDBValidKey | IDBKeyRange): Promise<number>{
         return (await (await this.store())?.index(key).count(query)) ?? 0

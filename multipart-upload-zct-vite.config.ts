@@ -2,10 +2,10 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   build: {
-    outDir: 'worker/dispatch', 
+    outDir: 'worker/dispatch',
     lib: {
-      entry: './worker/dispatch.ts', 
-      name: 'multipart-upload-zct', 
+      entry: './worker/dispatch.ts',
+      name: 'multipart-upload-zct',
       formats: ['es'],
     },
     rollupOptions: {

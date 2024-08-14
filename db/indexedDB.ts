@@ -64,7 +64,7 @@ export default class indexedDBClass {
             // 数据库初次创建或更新时会触发
             request.onupgradeneeded = event => {
                 const db = request.result
-                
+
                 for (const tableName in this._tableMap) {
                     createTable(db, tableName, this._tableMap[tableName])
                 }
@@ -73,7 +73,7 @@ export default class indexedDBClass {
             }
         })
     }
-    
+
     async getDB(): Promise<IDBDatabase|undefined> {
         await this.awaitInit()
         return this._db

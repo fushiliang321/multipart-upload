@@ -1,6 +1,6 @@
 import { IDBIndexProxy, IDBObjectStoreProxy } from './Interface'
 function ProxyResult(result: any): IDBIndexProxy|IDBObjectStoreProxy|any {
-    if (result instanceof IDBIndex || 
+    if (result instanceof IDBIndex ||
         result instanceof IDBObjectStore) {
         return new Proxy(result, ProxyHandler)
     }
