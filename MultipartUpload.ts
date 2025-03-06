@@ -621,7 +621,7 @@ export default class MultipartUpload {
             await this.cache.delete(this.cacheId)
         }
         if (this.successListeners?.length) {
-            let listeners = this.successListeners
+            const listeners = [...this.successListeners]
             this.successListeners.length = 0
             setTimeout(() => {
                 for (const fun of listeners) {
