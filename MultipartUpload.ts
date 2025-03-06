@@ -11,6 +11,7 @@ interface Task<T> extends Promise<T>{
     abort: (reason: any) => void,
     resume: () => Promise<any> | undefined,
     clearCache: () => Promise<any> | undefined,
+    success(listener: (response: any) => void): void,
     multipartUpload?: MultipartUpload
 }
 
@@ -37,6 +38,10 @@ function newMultipartUploadTask(fun: Function): Task<any> {
 
     task.clearCache = (): Promise<any> | undefined => {
         return task.multipartUpload?.clearCache()
+    }
+
+    task.success = (listener: (response: any) => void): void => {
+        return task.multipartUpload?.success(listener)
     }
 
     return task
