@@ -9,16 +9,11 @@ const defaultConfig: configType = {
 
 let globalConfig: configType  = defaultConfig
 
-export function setConfig(options: configType) {
-    if(options instanceof Object) {
-        globalConfig = {
-            ...defaultConfig,
-            ...options
-        }
-    }
+export function set(options: configType) {
+    globalConfig = options
 }
 
-export function config(): configType {
+export function get(): configType {
     return globalConfig
 }
 
