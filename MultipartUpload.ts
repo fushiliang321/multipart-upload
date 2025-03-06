@@ -1,4 +1,4 @@
-import { config, configType } from './config'
+import { get as config, configType } from './config'
 import CurrentLimiter from './CurrentLimiter'
 import { requestAdapterInterface } from './requestAdapters/interface'
 import CacheInterface  from './cache/interface'
@@ -99,6 +99,8 @@ export default class MultipartUpload {
     requestAbortFuns: Function[] = [] //请求中断方法
 
     lastResponse?: any //最后响应数据
+
+    successListeners:((response: any) => void)[] = [] //请求成功监听列表
 
     progressListeners:((progress: UploadProgress) => void)[] = [] //进度监听列表
     progress: number = 0 //上传进度百分比
@@ -303,7 +305,6 @@ export default class MultipartUpload {
         let i = 0
         while(this.uploadFinishPartNumberMap.has(++i)) {}
         const start = (i-1) * this.maxPartSize //从文件的指定位置开始读取
-
         await this.fileStream.read(async (data, done) => {
             const number = i++
             if (over) {
@@ -614,6 +615,15 @@ export default class MultipartUpload {
             // 合并成功，清除缓存
             await this.cache.delete(this.cacheId)
         }
+        if (this.successListeners?.length) {
+            let listeners = this.successListeners
+            this.successListeners.length = 0
+            setTimeout(() => {
+                for (const fun of listeners) {
+                    fun && fun(res)
+                }
+            })
+        }
         this.resumeStatusTag == statusTags.completed
         this.requestAbortFuns = []
         return res
@@ -679,6 +689,10 @@ export default class MultipartUpload {
 
     onUploadProgress(listener: (progress: UploadProgress) => void): void {
         this.progressListeners.push(listener)
+    }
+
+    success(listener: (response: any) => void): void {
+        this.successListeners.push(listener)
     }
 
     async clearCache(): Promise<boolean> {
