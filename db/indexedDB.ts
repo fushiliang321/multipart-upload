@@ -1,7 +1,7 @@
 const keyPath:string = 'id'
 
 //创建表
-function createTable(db: IDBDatabase, tableName: string, tableConfig: string[]|Object|string) {
+function createTable(db: IDBDatabase, tableName: string, tableConfig: string[]|Object|string|Record<string, any>) {
     if (db.objectStoreNames.contains(tableName)) {
         return
     }
@@ -18,8 +18,8 @@ function createTable(db: IDBDatabase, tableName: string, tableConfig: string[]|O
             break;
         case tableConfig instanceof Object:
             for (const key in tableConfig) {
-                const options = tableConfig[key].options ?? {}
-                const keyPath = tableConfig[key].keyPath ?? key
+                const options = (tableConfig as Record<string, any>)[key].options ?? {}
+                const keyPath = (tableConfig as Record<string, any>)[key].keyPath ?? key
                 objectStore.createIndex(key, keyPath, options)
             }
             break;

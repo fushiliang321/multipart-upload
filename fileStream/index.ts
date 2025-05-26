@@ -51,7 +51,7 @@ export default class FileStream implements FileStreamInterface{
                         await callBack(new ArrayBuffer(0), true)
                         break
                     }
-                    if (!await callBack(value.buffer.slice(0), false)) {
+                    if (!await callBack(value.buffer.slice(0) as ArrayBuffer, false)) {
                         return
                     }
                 }

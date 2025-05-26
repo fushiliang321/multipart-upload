@@ -108,10 +108,10 @@ export default class FileStream implements FileStreamInterface{
                 getFileSystemManager().getFileInfo({
                     filePath: this.path,
                     digestAlgorithm: 'md5',
-                    success: res => {
+                    success: (res: any) => {
                         resolve(res.digest)
                     },
-                    fail: res => {
+                    fail: (res: any) => {
                         reject(res)
                     }
                 })
