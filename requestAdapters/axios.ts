@@ -1,7 +1,7 @@
 import axios from "axios"
 import { abortPromiseInterface, requestAdapterInterface } from './interface'
 import CacheInterface from "../cache/interface"
-import MultipartUpload from "../MultipartUpload"
+import MultipartUpload, { statusTags, UploadProgress } from "../MultipartUpload"
 import { AxiosInstance, AxiosRequestConfig } from "./index"
 
 export function New(adapterConfig: object = {}, cache?: CacheInterface): MultipartUpload {
@@ -27,14 +27,14 @@ export default class requestAdapter implements requestAdapterInterface{
         return req
     }
 
-    init(url: string, params: object): abortPromiseInterface {
+    init(url: string, params: Record<string, any>): abortPromiseInterface {
         return this.post(url, params)
     }
 
-    part(url: string, file: Blob|ArrayBuffer|Uint8Array, params: object, onUploadProgress: (e: any) => void): abortPromiseInterface {
+    part(url: string, file: Blob|ArrayBuffer|Uint8Array, params: Record<string, any>, onUploadProgress: (e: UploadProgress) => void): abortPromiseInterface {
         const formData = new FormData()
         if (file instanceof ArrayBuffer || file instanceof Uint8Array) {
-            formData.append('file', new Blob([file]))
+            formData.append('file', new Blob([file as ArrayBuffer]))
         }else if (file instanceof Blob){
             formData.append('file', file)
         }else {
@@ -47,12 +47,13 @@ export default class requestAdapter implements requestAdapterInterface{
                     progress: e.progress,
                     total: e.total,
                     loaded: e.loaded,
+                    status: statusTags.uploading,
                 })
             }
         })
     }
 
-    complete(url: string, params: object): abortPromiseInterface  {
+    complete(url: string, params: Record<string, any>): abortPromiseInterface  {
         return this.post(url, params)
     }
 }

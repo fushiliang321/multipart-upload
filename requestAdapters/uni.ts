@@ -1,4 +1,4 @@
-import MultipartUpload from '../MultipartUpload'
+import MultipartUpload, { statusTags, UploadProgress } from '../MultipartUpload'
 import CacheInterface from '../cache/interface'
 import { abortPromiseInterface, requestAdapterInterface } from './interface'
 
@@ -35,7 +35,7 @@ export default class requestAdapter implements requestAdapterInterface{
     }
 
 
-    init(url: string, params: object): abortPromiseInterface {
+    init(url: string, params: Record<string, any>): abortPromiseInterface {
 		let abort: ((reason: any) => void ) | undefined
 
 		const request = new Promise(async (resolve,reject)=>{
@@ -55,12 +55,12 @@ export default class requestAdapter implements requestAdapterInterface{
 			}catch(e){
 				reject(e)
 			}
-		})
+		}) as abortPromiseInterface
 		request.abort = abort
         return request
     }
 
-    part(url: string, file: Blob|ArrayBuffer|Uint8Array|string, params: object, onUploadProgress: (e: any) => void): abortPromiseInterface {
+    part(url: string, file: Blob|ArrayBuffer|Uint8Array|string, params: Record<string, any>, onUploadProgress: (e: UploadProgress) => void): abortPromiseInterface {
 		let abort: ((reason: any) => void ) | undefined
 
 		const request = new Promise((resolve, reject)=>{
@@ -117,20 +117,21 @@ export default class requestAdapter implements requestAdapterInterface{
 				}
 				uploadTask.onProgressUpdate((e: any) => {
 				    onUploadProgress({
-				        progress: e.progress,
-				        total: e.totalBytesExpectedToSend,
-				        loaded: e.totalBytesSent,
-				    })
+						progress: e.progress,
+						total: e.totalBytesExpectedToSend,
+						loaded: e.totalBytesSent,
+						status: statusTags.uploading,
+					})
 				})
 			}catch(e){
 				reject(e)
 			}
-		})
+		}) as abortPromiseInterface
 		request.abort = abort
 		return request
     }
 
-    complete(url: string, params: object): abortPromiseInterface {
+    complete(url: string, params: Record<string, any>): abortPromiseInterface {
 
 		let abort: ((reason: any) => void ) | undefined
 		const request = new Promise(async (resolve,reject)=>{
@@ -150,7 +151,7 @@ export default class requestAdapter implements requestAdapterInterface{
 			}catch(e){
 				reject(e)
 			}
-		})
+		}) as abortPromiseInterface
 		request.abort = abort
 		return request
     }
