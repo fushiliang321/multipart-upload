@@ -31,13 +31,14 @@ export async function cacheToMultipartUpload(cacheData: progress, requestAdapter
         cacheData.id && await cache.delete(cacheData.id)
         return
     }
-    const file = await cache.getFile(key)
-    if (!(file instanceof File)) {
+    const cacheFile = await cache.getFile(key)
+    if (!(cacheFile instanceof File)) {
         //没有文件数据，清除进度缓存
         console.log('没有文件数据，清除进度缓存')
         cacheData.id && await cache.delete(cacheData.id)
         return
     }
+    const file = new File([cacheFile], cacheData.fileInfo?.name ?? cacheFile.name, cacheData.fileInfo)
     const multipartUpload = new MultipartUpload(requestAdapter)
     cacheData.uploadInfo && restoreUploadInfo(multipartUpload, cacheData.uploadInfo)
     if(cacheData.fileInfo?.hash) {
