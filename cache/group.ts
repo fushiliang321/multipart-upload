@@ -7,7 +7,7 @@ import CacheInterface from './interface'
 export type fileInfo = {
     name: string,
     size: number,
-    md5: string,
+    hash: string,
     type: string,
 }
 
@@ -29,7 +29,7 @@ export default class Group implements CacheInterface {
 
     async add(key: string, file: File, fileInfo: fileInfo, uploadInfo?: uploadInfo): Promise<IDBValidKey|false> {
         const free = await freeStorageSpace()
-        if (free.quotaAvailable - file.size <= 0) {
+        if (free.quotaAvailable < file.size) {
             throw new QuotaExceededError('存储空间不足,' + String(free.quotaAvailable - file.size))
         }
 

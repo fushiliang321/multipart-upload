@@ -1,5 +1,6 @@
 import { Message } from './index.d';
 import webworker from './dispatch/dispatch.es';
+import { get } from '../config';
 
 const tasks: Map<string, any> = new Map<string, any>()
 
@@ -18,6 +19,12 @@ function getWorker() {
 let i = 0
 const randomVal = Math.random()
 export function generateTaskId() {
+  try {
+    if (crypto) {
+      return crypto.randomUUID() + '_' + (++i)
+    }
+  } catch (error) {
+  }
   return randomVal + '_' + Math.random() + '_' + (++i)
 }
 
@@ -38,11 +45,11 @@ export default (e: any)=>{
     postMessage(e);
 }
 
-export async function fileMD5(file: File): Promise<string> {
+export async function fileHash(file: File): Promise<string> {
   const res = await postMessage({
     taskId: generateTaskId(),
-    type: 'fileMD5',
-    data: {file}
+    type: 'fileHash',
+    data: { file, mode: get().fileHashMode }
   })
   return res
 }

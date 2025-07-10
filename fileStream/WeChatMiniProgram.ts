@@ -11,7 +11,7 @@ function getFileSystemManager() {
 
 export default class FileStream implements FileStreamInterface{
     private path: string
-    private _md5?: string
+    private _hash?: string
     name: string
     type: string
     size: number
@@ -102,9 +102,9 @@ export default class FileStream implements FileStreamInterface{
         return getFileSystemManager().readFileSync(this.path)
     }
 
-    async md5(): Promise<string> {
-        if (!this._md5) {
-            this._md5 = await new Promise((resolve, reject) => {
+    async hash(): Promise<string> {
+        if (!this._hash) {
+            this._hash = await new Promise((resolve, reject) => {
                 getFileSystemManager().getFileInfo({
                     filePath: this.path,
                     digestAlgorithm: 'md5',
@@ -117,6 +117,6 @@ export default class FileStream implements FileStreamInterface{
                 })
             })
         }
-        return this._md5 as string
+        return this._hash as string
     }
 }

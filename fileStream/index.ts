@@ -1,9 +1,9 @@
-import { fileMD5 } from '../worker/index'
+import { fileHash } from '../worker/index'
 import { FileStreamInterface, readCallBackFunction } from './index.d'
 
 export default class FileStream implements FileStreamInterface{
     private _file: File
-    private _md5?: string
+    private _hash?: string
     name: string
     type: string
     size: number
@@ -65,10 +65,10 @@ export default class FileStream implements FileStreamInterface{
         return this._file
     }
 
-    async md5(): Promise<string> {
-        if (!this._md5) {
-            this._md5 = await fileMD5(this._file)
+    async hash(): Promise<string> {
+        if (!this._hash) {
+            this._hash = await fileHash(this._file)
         }
-        return this._md5 as string
+        return this._hash as string
     }
 }

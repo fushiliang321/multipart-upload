@@ -4,6 +4,14 @@ export type apiUrl = {
     complete: string //合并分片接口
 }
 
+export enum fileHashMode {
+    MD5 = 'MD5',
+    SHA1 = 'SHA-1',
+    SHA256 = 'SHA-256',
+    SHA384 = 'SHA-384',
+    SHA512 = 'SHA-512'
+}
+
 export type configType = {
     api: apiUrl, //接口配置
     maxPartSize: number, //每个分片的最大值，如果初始化接口响应了该值，则使用接口响应的值
@@ -11,7 +19,8 @@ export type configType = {
     retryNum: number, //失败重试次数
     retryInterval: number, //失败重试间隔（毫秒）
     concurrency: number, //并发上传分片数量
-    isCheckoutFileMD5: boolean, //是否校验文件md5
+    isCheckoutFileHash: boolean, //是否校验文件hash值
+    fileHashMode: fileHashMode, //文件hash值计算方式
     assureCacheFileWriteSequence: boolean, //是否需要保证缓存文件写入顺序
     speedLimit?: number, //限速，0表示不限速
 }
@@ -27,9 +36,10 @@ const defaultConfig: configType = {
     retryNum: 5,
     retryInterval: 1000,
     concurrency: 1,
-    isCheckoutFileMD5: true,
+    isCheckoutFileHash: true,
     assureCacheFileWriteSequence: true,
     speedLimit: 0,
+    fileHashMode: fileHashMode.MD5
 }
 
 let globalConfig: configType = defaultConfig

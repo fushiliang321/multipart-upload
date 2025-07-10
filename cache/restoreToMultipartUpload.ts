@@ -40,8 +40,8 @@ export async function cacheToMultipartUpload(cacheData: progress, requestAdapter
     }
     const multipartUpload = new MultipartUpload(requestAdapter)
     cacheData.uploadInfo && restoreUploadInfo(multipartUpload, cacheData.uploadInfo)
-    if(cacheData.fileInfo?.md5) {
-        multipartUpload.md5 = cacheData.fileInfo?.md5
+    if(cacheData.fileInfo?.hash) {
+        multipartUpload.hash = cacheData.fileInfo?.hash
     }
     await multipartUpload.setFile(file)
 

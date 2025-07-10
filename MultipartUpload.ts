@@ -83,7 +83,7 @@ const cacheFileWriteCurrentLimiter = new CurrentLimiter(1) //缓存文件写入�
 
 export default class MultipartUpload {
     size: number = 0 //文件大小
-    md5: string = '' //文件md5
+    hash: string = '' //文件hash值
     fileStream?: FileStreamInterface //文件流
 
     name: string = '' //文件名
@@ -158,7 +158,7 @@ export default class MultipartUpload {
     }
 
     fileUniqueKey(): string {
-        return this.md5 + '_' + String(this.size)
+        return this.hash + '_' + String(this.size)
     }
 
     async init(retryNum?: number): Promise<boolean> {
@@ -168,7 +168,7 @@ export default class MultipartUpload {
 
         try {
             const request = this.requestAdapter.init(this.config.api.init, {
-                md5: this.md5,
+                hash: this.hash,
                 size: this.size,
             })
             if (request.abort) {
@@ -441,8 +441,8 @@ export default class MultipartUpload {
         }
 
         try {
-            if (this.config.isCheckoutFileMD5 && !this.md5) {
-                this.md5 = await fileStream.md5()
+            if (this.config.isCheckoutFileHash && !this.hash) {
+                this.hash = await fileStream.hash()
             }
             if (this.status != statusTags.uninitialized) {
                 return false
@@ -458,7 +458,7 @@ export default class MultipartUpload {
                 const cacheKey = await this.cache.add(this.fileUniqueKey(), fileStream.getFile(), {
                     name: fileStream.name,
                     size: fileStream.size,
-                    md5: this.md5,
+                    hash: this.hash,
                     type: fileStream.type,
                 }, this.getUploadInfo())
                 if (cacheKey) {
@@ -486,7 +486,7 @@ export default class MultipartUpload {
         this.error = undefined
         this.uploadFinishPartNumberMap = new Map<number, boolean>()
         this.fileStream = undefined
-        this.md5 = ""
+        this.hash = ""
     }
 
     newMultipartUploadTask(fun: Function): Task<any> {

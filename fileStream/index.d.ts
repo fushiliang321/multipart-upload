@@ -6,7 +6,7 @@ export interface FileStreamInterface {
     size: number
     read(callBack: readCallBackFunction, bufferLength?: number, start?: number, end?: number): Promise<any>
     getFile(): File
-    md5(): Promise<string>
+    hash(): Promise<string>
 }
 
 export default FileStreamInterface
