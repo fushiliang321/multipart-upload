@@ -1,5 +1,6 @@
 import db from '../db/index'
 import Table from '../db/table'
+import fileSystem from './fileSystem'
 
 const filesTable = new Table(db, 'files')
 const progressTable = new Table(db, 'progress')
@@ -83,13 +84,7 @@ export async function progressDelete(query: IDBValidKey | IDBKeyRange): Promise<
 }
 
 export default {
-    file: {
-        getAll: filesGetAll,
-        getIndexAll: filesGetIndexAll,
-        get: filesGet,
-        set: filesSet,
-        delete: filesDelete,
-    },
+    file: fileSystem,
     progress: {
         getAll: progressGetAll,
         getIndexAll: progressGetIndexAll,
