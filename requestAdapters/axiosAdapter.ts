@@ -1,8 +1,8 @@
-import axios from "axios"
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios"
 import { abortPromiseInterface, requestAdapterInterface } from './interface'
 import CacheInterface from "../cache/interface"
 import MultipartUpload, { statusTags, UploadProgress } from "../MultipartUpload"
-import { AxiosInstance, AxiosRequestConfig } from "./index"
+// import { AxiosInstance, AxiosRequestConfig } from "./index"
 
 export function New(adapterConfig: object = {}, cache?: CacheInterface): MultipartUpload {
     return new MultipartUpload(new requestAdapter(adapterConfig), cache)
@@ -13,7 +13,7 @@ export default class requestAdapter implements requestAdapterInterface{
     requestInstance: AxiosInstance
 
     constructor(config: object = {}) {
-        this.requestInstance = axios.create(config) as AxiosInstance
+        this.requestInstance = axios.create(config)
     }
 
     private post(url: string, data?: any, config?: AxiosRequestConfig<any>): abortPromiseInterface {
