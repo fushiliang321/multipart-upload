@@ -69,15 +69,7 @@ export type UploadProgress = {
     loaded: number;
 }
 
-export type uploadInfo = {
-    uploadId: string;
-    maxPartSize: number;
-    maxFileSize: number;
-    requestParams: object;
-    progress: number;
-    uploadFinishPartSize: number;
-    parts: PartETag[];
-}
+export type uploadInfo = Pick<MultipartUpload, 'uploadId' | 'maxPartSize' | 'maxFileSize' | 'requestParams' | 'progress' | 'uploadFinishPartSize' | 'parts'>
 
 const cacheFileWriteCurrentLimiter = new CurrentLimiter(1) //缓存文件写入限流器
 
@@ -126,8 +118,11 @@ export default class MultipartUpload {
 
     constructor(requestAdapter: requestAdapterInterface, cache?: CacheInterface) {
 		this.requestAdapter = requestAdapter
-        this.cache = cache
         this.config = config()
+        if (cache === undefined && this.config.fileCache) {
+            cache = this.config.fileCache
+        }
+        this.cache = cache
         this.reloadConfig()
     }
 
