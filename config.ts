@@ -19,11 +19,11 @@ export enum fileHashMode {
 
 export type configType = {
     api: apiUrl, //接口配置
-    maxPartSize: number, //每个分片的最大值，如果初始化接口响应了该值，则使用接口响应的值
-    maxFileSize: number, //文件的最大值，如果初始化接口响应了该值，则使用接口响应的值
+    maxPartSize: number, //单个分片的最大字节数，如果初始化接口响应了该值，则使用接口响应的值
+    maxFileSize: number, //文件的最大字节数，如果初始化接口响应了该值，则使用接口响应的值|
     retryNum: number, //失败重试次数
     retryInterval: number, //失败重试间隔（毫秒）
-    concurrency: number, //并发上传分片数量
+    concurrency: number, //分片并发上传数量
     isCheckoutFileHash: boolean, //是否校验文件hash值
     fileHashMode: fileHashMode, //文件hash值计算方式
     assureCacheFileWriteSequence: boolean, //是否需要保证缓存文件写入顺序
