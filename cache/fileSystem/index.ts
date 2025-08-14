@@ -2,13 +2,19 @@ import FileSystem from './interface'
 import OpfsFile from './opfs/index'
 import DbFile from './db/index'
 import { fileCacheInfo } from '../cache'
+import { get, mode } from '../config';
 
 let _fileSystem: (new (name: string) => FileSystem) | undefined = undefined;
 
 function fileSystem(name: string): FileSystem {
     if (!_fileSystem) {
         try {
-            _fileSystem = !navigator?.storage?.getDirectory ? DbFile : OpfsFile;
+            const cacheMode = get().mode
+            if (cacheMode === mode.indexedDB) {
+                _fileSystem = DbFile
+            }else{
+                _fileSystem = !navigator?.storage?.getDirectory ? DbFile : OpfsFile;
+            }
         } catch (error) {
             _fileSystem = DbFile
         }
