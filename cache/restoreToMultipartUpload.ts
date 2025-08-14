@@ -1,3 +1,4 @@
+import { defaultAdapter, defaultFileCache } from "..";
 import MultipartUpload, { statusTags, uploadInfo } from "../MultipartUpload";
 import { requestAdapterInterface } from "../requestAdapters/interface";
 import { progress } from "./group";
@@ -6,8 +7,10 @@ import CacheInterface from "./interface";
 //恢复上传信息
 export function restoreUploadInfo(multipartUpload: MultipartUpload, uploadInfo: uploadInfo ) {
     for (const key in uploadInfo) {
+        if (key in multipartUpload) {
+        }
         if (multipartUpload.hasOwnProperty(key)) {
-            multipartUpload[key] = uploadInfo[key]
+            (multipartUpload as any)[key] = (uploadInfo as any)[key]
         }
     }
 
@@ -55,9 +58,18 @@ export async function cacheToMultipartUpload(cacheData: progress, requestAdapter
 }
 
 //所有缓存数据恢复成分片上传任务对象
-export default async (requestAdapter: requestAdapterInterface, cache: CacheInterface): Promise<MultipartUpload[]> => {
-    const list: Promise<MultipartUpload|undefined>[] = []
+export default async (requestAdapter?: requestAdapterInterface, cache?: CacheInterface): Promise<MultipartUpload[]> => {
+    if (!cache) {
+        cache = defaultFileCache()
+        if (!cache) {
+            return []
+        }
+    }
+    if (!requestAdapter) {
+        requestAdapter = defaultAdapter()
+    }
     const progressList = await cache.getAll()
+    const list: Promise<MultipartUpload|undefined>[] = []
     for (const progress of progressList) {
         list.push(cacheToMultipartUpload(progress, requestAdapter, cache))
     }
