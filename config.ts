@@ -1,3 +1,8 @@
+import CacheInterface from "./cache/interface"
+import { requestAdapterInterface } from "./requestAdapters/interface"
+import fetchAdapter from "./requestAdapters/fetchAdapter"
+import { group } from "./cache"
+
 export type apiUrl = {
     init: string, //初始化接口
     part: string, //上传分片接口
@@ -23,6 +28,8 @@ export type configType = {
     fileHashMode: fileHashMode, //文件hash值计算方式
     assureCacheFileWriteSequence: boolean, //是否需要保证缓存文件写入顺序
     speedLimit?: number, //限速，0表示不限速
+    requestAdapter: new(config: object) => requestAdapterInterface, //默认的请求适配器
+    fileCache: CacheInterface | false, //默认的文件缓存
 }
 
 const defaultConfig: configType = {
@@ -39,7 +46,9 @@ const defaultConfig: configType = {
     isCheckoutFileHash: true,
     assureCacheFileWriteSequence: true,
     speedLimit: 0,
-    fileHashMode: fileHashMode.MD5
+    fileHashMode: fileHashMode.MD5,
+    requestAdapter: fetchAdapter,
+    fileCache: group('defaultFileCache'),
 }
 
 let globalConfig: configType = defaultConfig
