@@ -43,6 +43,8 @@ export async function cacheToMultipartUpload(cacheData: progress, requestAdapter
     }
     const file = new File([cacheFile], cacheData.fileInfo?.name ?? cacheFile.name, cacheData.fileInfo)
     const multipartUpload = new MultipartUpload(requestAdapter)
+    //移除默认的缓存配置，避免设置文件信息的时候重复缓存
+    multipartUpload.setCache(undefined)
     cacheData.uploadInfo && restoreUploadInfo(multipartUpload, cacheData.uploadInfo)
     if(cacheData.fileInfo?.hash) {
         multipartUpload.hash = cacheData.fileInfo?.hash
