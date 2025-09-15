@@ -1,7 +1,7 @@
 import CacheInterface from "./cache/interface"
 import { requestAdapterInterface } from "./requestAdapters/interface"
 import fetchAdapter from "./requestAdapters/fetchAdapter"
-import { group } from "./cache"
+import cache from "./cache"
 
 export type apiUrl = {
     init: string, //初始化接口
@@ -48,7 +48,7 @@ const defaultConfig: configType = {
     speedLimit: 0,
     fileHashMode: fileHashMode.MD5,
     requestAdapter: fetchAdapter,
-    fileCache: group('defaultFileCache'),
+    fileCache: cache.group('defaultFileCache'),
 }
 
 let globalConfig: configType = defaultConfig

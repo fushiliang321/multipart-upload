@@ -1,11 +1,11 @@
 import cache from './cache'
 import Group from './group'
 
-export async function getAll() {
-    return await cache.progress.getAll()
+export function getAll() {
+    return cache.progress.getAll()
 }
 
-const GlobalGroupMap: Map<string, Group> = new Map<string, Group>();
+const GlobalGroupMap = new Map<string, Group>()
 export function group(name: string): Group {
     let group = GlobalGroupMap.get(name)
     if (!group) {
