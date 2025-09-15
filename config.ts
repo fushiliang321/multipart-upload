@@ -1,7 +1,7 @@
 import CacheInterface from "./cache/interface"
 import { requestAdapterInterface } from "./requestAdapters/interface"
 import fetchAdapter from "./requestAdapters/fetchAdapter"
-import cache from "./cache"
+import cache from "./cache/index"
 
 export type apiUrl = {
     init: string, //初始化接口
