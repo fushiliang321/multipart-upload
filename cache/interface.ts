@@ -1,5 +1,5 @@
-import { uploadInfo } from "../MultipartUpload";
 import { fileInfo, progress } from "./group";
+import { uploadInfo } from '../index.d';
 
 export default interface CacheInterface{
     add(key: string, file: File, fileInfo: fileInfo, uploadInfo?: uploadInfo): Promise<IDBValidKey|false>;

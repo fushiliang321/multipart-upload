@@ -1,4 +1,4 @@
-import FileSystem, {fileDataType} from '../interface'
+import FileSystem, { fileDataType } from '../interface'
 
 let opfsRoot: FileSystemDirectoryHandle | undefined = undefined
 

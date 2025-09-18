@@ -1,8 +1,8 @@
 import FileSystem from './interface'
 import OpfsFile from './opfs/index'
 import DbFile from './db/index'
-import { fileCacheInfo } from '../cache'
 import { get, mode } from '../config';
+import { fileCacheInfo } from '../index.d';
 
 let _fileSystem: (new (name: string) => FileSystem) | undefined = undefined;
 

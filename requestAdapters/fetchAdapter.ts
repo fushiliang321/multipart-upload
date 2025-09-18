@@ -1,7 +1,8 @@
 import { AxiosResponse } from 'axios'
-import MultipartUpload, { UploadProgress } from '../MultipartUpload'
+import MultipartUpload from '../MultipartUpload'
 import CacheInterface from '../cache/interface'
 import { abortPromiseInterface, requestAdapterInterface } from './interface'
+import { UploadProgress } from '../index.d';
 
 export function New(adapterConfig: object = {}, cache?: CacheInterface): MultipartUpload {
     return new MultipartUpload(new requestAdapter(adapterConfig), cache)

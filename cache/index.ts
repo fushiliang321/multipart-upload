@@ -11,7 +11,6 @@ export function group(name: string): Group {
     if (!group) {
         group = new Group(name)
         GlobalGroupMap.set(name, group)
-        return group
     }
     return group
 }

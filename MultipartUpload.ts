@@ -5,6 +5,7 @@ import CacheInterface  from './cache/interface'
 import FileStream from './fileStream/index'
 import WMPFileStream from './fileStream/WeChatMiniProgram'
 import { FileStreamInterface } from './fileStream/index.d'
+import { PartETag, statusTags, UploadProgress, uploadInfo } from './index.d';
 
 interface Task<T> extends Promise<T>{
     onUploadProgress: (listener: (progress: UploadProgress) => void) => void,
@@ -47,29 +48,6 @@ function newMultipartUploadTask(fun: Function): Task<any> {
     return task
 }
 
-export enum statusTags {
-    uninitialized = 0,//未初始化
-    initializing = 1,//初始化中
-    uploading = 2,//上传中
-    merging = 3,//文件合并中
-    completed = 4,//已完成
-    abnormal = 5,//执行异常
-    abort = 6,//中断
-}
-
-type PartETag = {
-    ETag: string;
-    PartNumber: number;
-}
-
-export type UploadProgress = {
-    status: statusTags;
-    progress: number;
-    total: number;
-    loaded: number;
-}
-
-export type uploadInfo = Pick<MultipartUpload, 'uploadId' | 'maxPartSize' | 'maxFileSize' | 'requestParams' | 'progress' | 'uploadFinishPartSize' | 'parts'>
 
 const cacheFileWriteCurrentLimiter = new CurrentLimiter(1) //缓存文件写入限流器
 

@@ -1,5 +1,5 @@
 import { AxiosPromise } from "axios";
-import { UploadProgress } from "../MultipartUpload";
+import { UploadProgress } from '../index.d';
 
 export interface requestAdapterInterface {
     init(url: string, params: Record<string, any>): abortPromiseInterface;

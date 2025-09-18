@@ -1,6 +1,7 @@
 import db from '../db/index'
 import Table from '../db/table'
-import fileSystem from './fileSystem'
+import fileSystem from './fileSystem/index'
+import { fileCacheInfo } from './index.d';
 
 const filesTable = new Table(db, 'files')
 const progressTable = new Table(db, 'progress')
@@ -36,11 +37,6 @@ export async function filesGetAll(query?: IDBValidKey | IDBKeyRange | null, coun
 
 export async function filesGetIndexAll(group: string, value?: IDBValidKey | IDBKeyRange | null): Promise<any[]> {
     return await _getAllByIndex(filesTable, group, value)
-}
-
-export type fileCacheInfo = {
-    key: string,
-    file: File,
 }
 
 export async function filesGet(key: string): Promise<fileCacheInfo|undefined> {

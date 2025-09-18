@@ -1,5 +1,6 @@
+import { statusTags, uploadInfo } from "../index.d";
 import { defaultAdapter, defaultFileCache } from "..";
-import MultipartUpload, { statusTags, uploadInfo } from "../MultipartUpload";
+import MultipartUpload from "../MultipartUpload";
 import { requestAdapterInterface } from "../requestAdapters/interface";
 import { progress } from "./group";
 import CacheInterface from "./interface";
