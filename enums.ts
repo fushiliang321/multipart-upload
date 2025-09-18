@@ -7,3 +7,7 @@ export enum statusTags {
     abnormal = 5,//执行异常
     abort = 6,//中断
 }
+
+export default {
+    statusTags
+}
