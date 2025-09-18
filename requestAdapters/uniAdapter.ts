@@ -1,7 +1,8 @@
 import MultipartUpload from '../MultipartUpload'
 import CacheInterface from '../cache/interface'
 import { abortPromiseInterface, requestAdapterInterface } from './interface'
-import { statusTags, UploadProgress } from '../index.d';
+import { UploadProgress } from '../index.d';
+import { statusTags } from '../enums';
 
 export function New(adapterConfig: object = {}, cache?: CacheInterface): MultipartUpload {
     return new MultipartUpload(new requestAdapter(adapterConfig), cache)

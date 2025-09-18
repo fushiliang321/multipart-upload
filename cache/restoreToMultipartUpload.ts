@@ -1,9 +1,10 @@
-import { statusTags, uploadInfo } from "../index.d";
+import { uploadInfo } from "../index.d";
 import { defaultAdapter, defaultFileCache } from "..";
 import MultipartUpload from "../MultipartUpload";
 import { requestAdapterInterface } from "../requestAdapters/interface";
 import { progress } from "./group";
 import CacheInterface from "./interface";
+import { statusTags } from "../enums";
 
 //恢复上传信息
 export function restoreUploadInfo(multipartUpload: MultipartUpload, uploadInfo: uploadInfo ) {

@@ -1,8 +1,9 @@
 import cache from './cache'
 import { freeStorageSpace } from './common'
 import QuotaExceededError from './QuotaExceededError'
-import { statusTags, uploadInfo } from '../index.d'
+import { uploadInfo } from '../index.d'
 import CacheInterface from './interface'
+import { statusTags } from '../enums'
 
 export type fileInfo = {
     name: string,

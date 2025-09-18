@@ -5,7 +5,8 @@ import CacheInterface  from './cache/interface'
 import FileStream from './fileStream/index'
 import WMPFileStream from './fileStream/WeChatMiniProgram'
 import { FileStreamInterface } from './fileStream/index.d'
-import { PartETag, statusTags, UploadProgress, uploadInfo } from './index.d';
+import { PartETag, UploadProgress, uploadInfo } from './index.d';
+import { statusTags } from './enums'
 
 interface Task<T> extends Promise<T>{
     onUploadProgress: (listener: (progress: UploadProgress) => void) => void,
